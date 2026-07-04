@@ -17,3 +17,6 @@
 - [Facade](./02-structural/Facade/) — Фасад
 - [Flyweight](./02-structural/Flyweight/) — Легковес
 - [Proxy](./02-structural/Proxy/) — Заместитель
+
+### Поведенческие (Behavioral)
+- [Command](./03-behavioral/Command/) — Команда
