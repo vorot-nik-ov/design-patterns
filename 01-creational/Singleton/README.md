@@ -10,18 +10,19 @@
 ## UML Схема класса
 ```mermaid
 classDiagram
-    class AppSettings {
-        -instance : AppSettings*
-        -settings : Map
-        -AppSettings()
-        -~AppSettings()
-        +getInstance() AppSettings*
-        +destroyInstance() void
-        +get(key) string
-        +set(key, value) void
-        +showAll() void
-        +resetToDefault() void
-    }
+class AppSettings {
+-instance : AppSettings*
+-settings : Map
+-AppSettings()
+-~AppSettings()
++getInstance() AppSettings*
++destroyInstance() void
++get(key) string
++set(key, value) void
++showAll() void
++resetToDefault() void
+}
+style AppSettings fill:transparent,stroke:#000,color:#000,font-style:normal,font-weight:normal
 ```
 ## Особенности реализации на C++
 ### Запрет копирования: 
@@ -30,19 +31,19 @@ classDiagram
 так как объект создается через new, предусмотрен метод destroyInstance() для его корректного удаления, чтобы избежать утечек памяти.
 ### Потокобезопасность:
 данная реализация является классической, но не является потокобезопасной (thread-safe). Если getInstance() вызовется из двух потоков одновременно, могут создаться два объекта.
-
-### Примечание:
+###
+Примечание:
 для продакшена на C++11 и выше рекомендуется использовать "Синглтон Мейерса" (объявление static AppSettings instance; внутри функции getInstance()), который гарантирует потокобезопасность на уровне компилятора.
 
-### Плюсы
+## Плюсы
 Гарантирует единственный экземпляр настроек во всем приложении.
 Предоставляет глобальную точку доступа к объекту.
 Ленивая инициализация: объект создается только тогда, когда впервые к нему обращаются.
-### Минусы
+## Минусы
 Нарушает принцип единственной ответственности (SRP): класс контролирует и свое создание, и свою логику.
 Усложняет написание юнит-тестов (так как глобальное состояние сложно сбрасывать между тестами).
 Требует осторожности в многопоточной среде.
-### Пример реализации
+## Пример реализации
 Вся реализация паттерна, включая класс и пример использования в main(), находится в одном файле:
 
 Singleton.cpp
