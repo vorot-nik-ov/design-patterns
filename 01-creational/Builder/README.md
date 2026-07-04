@@ -8,57 +8,92 @@
 разделить алгоритм создания сложного объекта от его представления. Выделить класс Director, который будет задавать порядок шагов сборки, и абстрактный класс Builder, который определяет эти шаги. Конкретные строители (CarBuilder, ManualBuilder) реализуют шаги по-своему и возвращают разные конечные продукты.
 
 ## UML Схема класса
-``` mermaid
+```
+mermaid
 classDiagram
 class Director {
-+makeSportCar(Builder) void
-+makeLimusin(Builder) void
++makeSportCar
++makeLimusinCar
 }
 class Builder {
 <<interface>>
-+reset() void
-+setSeats(string) void
-+setEngine(Engine) void
-+setABS() void
-+setGPS() void
-+setWheels(string) void
++reset() virtual void
++setSeats(quantity) virtual void
++setEngine(horsepower) virtual void
++setABS() virtual void
++setGPS() virtual void
++setWheels(quantity) virtual void
 }
 class CarBuilder {
 -result : Car
 +reset() void
-+setSeats(string) void
-+setEngine(Engine) void
++setSeats(quantity) void
++setEngine(horsepower) void
 +setABS() void
 +setGPS() void
-+setWheels(string) void
++setWheels(quantity) void
 +getResult() Car
 }
 class ManualBuilder {
 -result : Manual
 +reset() void
-+setSeats(string) void
-+setEngine(Engine) void
++setSeats(quantity) void
++setEngine(horsepower) void
 +setABS() void
 +setGPS() void
-+setWheels(string) void
++setWheels(quantity) void
 +getResult() Manual
 }
 class Car {
 +seats : vector
-+engine : Engine
 +wheels : vector
++engine : Engine
++ABSystem : ABS
++GPSystem : GPS
 +speed : int
-+setSpeed(int) void
++setSpeed() void
 +Drive() void
 +getInfo() void
 }
 class Manual {
 -seats : string
 -enginePower : int
--wheels : string
+-wheels : vector
 -hasABS : bool
--hasGPS : bool
-+ReadInstruction() void
++hasGPS : bool
++setSeats(seat) void
++setEngine(power) void
++setWheels(wheel) void
++setABS() void
++setGPS() void
++ReadInstruction() string
+}
+class Seat {
+-comfortLevel : string
++Seat(comfortLevel)
++getComfort() string
+}
+class Engine {
+-horsepower : int
++Engine(horsepower)
++getHorsePower() int
+}
+class Wheel {
+-gripQuality : string
++Wheel(gripQuality)
++getGrip() string
+}
+class ABS {
+-enabled : bool
++ABS(enabled)
++enable() void
++getStatus() string
+}
+class GPS {
+-enabled : bool
++GPS(enabled)
++enable() void
++getStatus() string
 }
 
 Director --> Builder : использует
@@ -67,12 +102,29 @@ ManualBuilder --|> Builder : реализует
 CarBuilder ..> Car : создает
 ManualBuilder ..> Manual : создает
 
+Car *-- Seat
+Car *-- Engine
+Car *-- ABS
+Car *-- GPS
+Car *-- Wheel
+
+Manual *-- Seat
+Manual *-- Engine
+Manual *-- ABS
+Manual *-- GPS
+Manual *-- Wheel
+
 style Director fill:transparent,stroke:#000,color:#000,font-style:normal,font-weight:normal
 style Builder fill:transparent,stroke:#000,color:#000,font-style:normal,font-weight:normal
 style CarBuilder fill:transparent,stroke:#000,color:#000,font-style:normal,font-weight:normal
 style ManualBuilder fill:transparent,stroke:#000,color:#000,font-style:normal,font-weight:normal
 style Car fill:transparent,stroke:#000,color:#000,font-style:normal,font-weight:normal
 style Manual fill:transparent,stroke:#000,color:#000,font-style:normal,font-weight:normal
+style Seat fill:transparent,stroke:#000,color:#000,font-style:normal,font-weight:normal
+style Engine fill:transparent,stroke:#000,color:#000,font-style:normal,font-weight:normal
+style Wheel fill:transparent,stroke:#000,color:#000,font-style:normal,font-weight:normal
+style ABS fill:transparent,stroke:#000,color:#000,font-style:normal,font-weight:normal
+style GPS fill:transparent,stroke:#000,color:#000,font-style:normal,font-weight:normal
 ```
 
 ## Особенности реализации на C++
