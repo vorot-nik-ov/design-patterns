@@ -7,3 +7,4 @@
 ### Порождающие (Creational)
 - [Singleton](./01-creational/Singleton/) — Одиночка
 - [Builder](./01-creational/Builder/) — Строитель
+- [Factory Method](./01-creational/Factory-Method/) — Фабричный метод
