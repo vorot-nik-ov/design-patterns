@@ -12,3 +12,5 @@
 ### Структурные (Structural)
 - [Adapter](./02-structural/Adapter/) — Адаптер
 - [Bridge](./02-structural/Bridge/) — Мост
+- [Composite](./02-structural/Composite/) — Компоновщик
+- [Decorator](./02-structural/Decorator/) — Декоратор
