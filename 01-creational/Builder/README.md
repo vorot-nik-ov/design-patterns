@@ -89,7 +89,8 @@ style Seat2 fill:transparent,stroke:#000,color:#000,font-style:normal,font-weigh
 style Engine2 fill:transparent,stroke:#000,color:#000,font-style:normal,font-weight:normal
 style Wheel2 fill:transparent,stroke:#000,color:#000,font-style:normal,font-weight:normal
 style ABS2 fill:transparent,stroke:#000,color:#000,font-style:normal,font-weight:normal
-style GPS2 fill:transparent,stroke:#000,color:#000,font-style:normal,font-weight:normal ```
+style GPS2 fill:transparent,stroke:#000,color:#000,font-style:normal,font-weight:normal
+```
 
 ## Особенности реализации на C++
 ### Абстрактный класс:
