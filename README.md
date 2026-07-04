@@ -16,3 +16,4 @@
 - [Decorator](./02-structural/Decorator/) — Декоратор
 - [Facade](./02-structural/Facade/) — Фасад
 - [Flyweight](./02-structural/Flyweight/) — Легковес
+- [Proxy](./02-structural/Proxy/) — Заместитель
