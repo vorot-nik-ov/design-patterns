@@ -22,3 +22,4 @@
 - [Command](./03-behavioral/Command/) — Команда
 - [Observer](./03-behavioral/Observer/) — Наблюдатель
 - [State](./03-behavioral/State/) — Состояние
+- [Strategy](./03-behavioral/Strategy/) — Стратегия
