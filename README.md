@@ -14,3 +14,4 @@
 - [Bridge](./02-structural/Bridge/) — Мост
 - [Composite](./02-structural/Composite/) — Компоновщик
 - [Decorator](./02-structural/Decorator/) — Декоратор
+- [Facade](./02-structural/Facade/) — Фасад
