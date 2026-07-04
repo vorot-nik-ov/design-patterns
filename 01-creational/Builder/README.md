@@ -1,1 +1,97 @@
 # Builder (Строитель)
+Строитель — это порождающий паттерн проектирования, который позволяет поэтапно создавать сложные объекты с помощью одного и того же процесса сборки.
+
+## Проблема:
+создание сложного объекта (например, автомобиля) требует инициализации множества полей, частей и подсистем. Создавать огромный конструктор с десятком параметров неудобно. Кроме того, иногда нужно создавать разные представления одного и того же объекта (например, саму машину и инструкцию к ней), используя один и тот же процесс сборки.
+
+## Решение:
+разделить алгоритм создания сложного объекта от его представления. Выделить класс Director, который будет задавать порядок шагов сборки, и абстрактный класс Builder, который определяет эти шаги. Конкретные строители (CarBuilder, ManualBuilder) реализуют шаги по-своему и возвращают разные конечные продукты.
+
+## UML Схема класса
+```
+mermaid
+classDiagram
+class Director {
++makeSportCar(Builder) void
++makeLimusin(Builder) void
+}
+class Builder {
+<<interface>>
++reset() void
++setSeats(string) void
++setEngine(Engine) void
++setABS() void
++setGPS() void
++setWheels(string) void
+}
+class CarBuilder {
+-result : Car
++reset() void
++setSeats(string) void
++setEngine(Engine) void
++setABS() void
++setGPS() void
++setWheels(string) void
++getResult() Car
+}
+class ManualBuilder {
+-result : Manual
++reset() void
++setSeats(string) void
++setEngine(Engine) void
++setABS() void
++setGPS() void
++setWheels(string) void
++getResult() Manual
+}
+class Car {
++seats : vector
++engine : Engine
++wheels : vector
++speed : int
++setSpeed(int) void
++Drive() void
++getInfo() void
+}
+class Manual {
+-seats : string
+-enginePower : int
+-wheels : string
+-hasABS : bool
+-hasGPS : bool
++ReadInstruction() void
+}
+
+Director --> Builder : использует
+CarBuilder --|> Builder : реализует
+ManualBuilder --|> Builder : реализует
+CarBuilder ..> Car : создает
+ManualBuilder ..> Manual : создает
+
+style Director fill:transparent,stroke:#000,color:#000,font-style:normal,font-weight:normal
+style Builder fill:transparent,stroke:#000,color:#000,font-style:normal,font-weight:normal
+style CarBuilder fill:transparent,stroke:#000,color:#000,font-style:normal,font-weight:normal
+style ManualBuilder fill:transparent,stroke:#000,color:#000,font-style:normal,font-weight:normal
+style Car fill:transparent,stroke:#000,color:#000,font-style:normal,font-weight:normal
+style Manual fill:transparent,stroke:#000,color:#000,font-style:normal,font-weight:normal
+```
+
+## Особенности реализации на C++
+### Абстрактный класс:
+используется класс Builder с чисто виртуальными методами (= 0), что заставляет наследников реализовать все шаги сборки.
+### Разные продукты:
+возвращаемые типы методов getResult() в наследниках разные (Car и Manual), что допустимо в C++, так как они не являются переопределениями виртуальных функций базового класса (базовый класс не знает о конечном продукте).
+### Агрегация деталей:
+конечный продукт (Car) содержит в себе другие объекты (Engine, ABS, GPS), что демонстрирует работу с составными частями сложного объекта.
+## Плюсы
+Позволяет шаг за шагом создавать сложные объекты.
+Изолирует код сборки от бизнес-логики конечного продукта.
+Дает возможность использовать один и тот же код сборки для создания разных представлений.
+Реализует принцип открытости/закрытости (легко добавить нового строителя без изменения директора).
+## Минусы
+Усложняет код программы за счет добавления новых классов.
+Клиент привязан к конкретным классам строителей (в данном примере в main жестко задано создание CarBuilder и ManualBuilder).
+## Пример реализации
+Весь код, включая абстрактный строителя, конкретных строителей, директора и пример использования, находится в одном файле:
+
+Builder.cpp
