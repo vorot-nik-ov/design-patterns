@@ -8,122 +8,88 @@
 разделить алгоритм создания сложного объекта от его представления. Выделить класс Director, который будет задавать порядок шагов сборки, и абстрактный класс Builder, который определяет эти шаги. Конкретные строители (CarBuilder, ManualBuilder) реализуют шаги по-своему и возвращают разные конечные продукты.
 
 ## UML Схема класса
-``` mermaid
-classDiagram
-class Director {
-+makeSportCar
-+makeLimusinCar
-}
-class Builder {
-<<interface>>
-+reset() virtual void
-+setSeats(quantity) virtual void
-+setEngine(horsepower) virtual void
-+setABS() virtual void
-+setGPS() virtual void
-+setWheels(quantity) virtual void
-}
-class CarBuilder {
--result : Car
-+reset() void
-+setSeats(quantity) void
-+setEngine(horsepower) void
-+setABS() void
-+setGPS() void
-+setWheels(quantity) void
-+getResult() Car
-}
-class ManualBuilder {
--result : Manual
-+reset() void
-+setSeats(quantity) void
-+setEngine(horsepower) void
-+setABS() void
-+setGPS() void
-+setWheels(quantity) void
-+getResult() Manual
-}
-class Car {
-+seats : vector
-+wheels : vector
-+engine : Engine
-+ABSystem : ABS
-+GPSystem : GPS
-+speed : int
-+setSpeed() void
-+Drive() void
-+getInfo() void
-}
-class Manual {
--seats : string
--enginePower : int
--wheels : vector
--hasABS : bool
-+hasGPS : bool
-+setSeats(seat) void
-+setEngine(power) void
-+setWheels(wheel) void
-+setABS() void
-+setGPS() void
-+ReadInstruction() string
-}
-class Seat {
--comfortLevel : string
-+Seat(comfortLevel)
-+getComfort() string
-}
-class Engine {
--horsepower : int
-+Engine(horsepower)
-+getHorsePower() int
-}
-class Wheel {
--gripQuality : string
-+Wheel(gripQuality)
-+getGrip() string
-}
-class ABS {
--enabled : bool
-+ABS(enabled)
-+enable() void
-+getStatus() string
-}
-class GPS {
--enabled : bool
-+GPS(enabled)
-+enable() void
-+getStatus() string
-}
+``` flowchart TD
+subgraph top [ ]
+direction LR
+Builder["<b>Builder</b><hr>+ reset() void
++ setSeats() void
++ setEngine() void
++ setABS() void
++ setGPS() void
++ setWheels() void"]
+Director["<b>Director</b><hr>+ makeSportCar()
++ makeLimusinCar()"]
+end
 
-Director --> Builder : использует
-CarBuilder --|> Builder : реализует
-ManualBuilder --|> Builder : реализует
-CarBuilder ..> Car : создает
-ManualBuilder ..> Manual : создает
+subgraph middle [ ]
+direction LR
+CarBuilder["<b>CarBuilder</b><hr>- result : Car<br>+ reset() void<br>+ setSeats() void<br>+ getResult() Car"]
+ManualBuilder["<b>ManualBuilder</b><hr>- result : Manual<br>+ reset() void<br>+ setSeats() void<br>+ getResult() Manual"]
+end
 
-Car *-- Seat
-Car *-- Engine
-Car *-- ABS
-Car *-- GPS
-Car *-- Wheel
+subgraph bottom [ ]
+direction LR
+subgraph left_side [ ]
+direction TB
+Car["<b>Car</b><hr>+ seats : vector<br>+ wheels : vector<br>+ engine : Engine<br>+ ABSystem : ABS<br>+ GPSystem : GPS<br>+ speed : int"]
+subgraph car_det [ ]
+direction LR
+Seat1["<b>Seat</b><hr>- comfortLevel"]
+Engine1["<b>Engine</b><hr>- horsepower"]
+Wheel1["<b>Wheel</b><hr>- gripQuality"]
+ABS1["<b>ABS</b><hr>- enabled"]
+GPS1["<b>GPS</b><hr>- enabled"]
+end
+Car --> Seat1 & Engine1 & Wheel1 & ABS1 & GPS1
+end
 
-Manual *-- Seat
-Manual *-- Engine
-Manual *-- ABS
-Manual *-- GPS
-Manual *-- Wheel
+subgraph right_side [ ]
+direction TB
+Manual["<b>Manual</b><hr>- seats : string<br>- enginePower : int<br>- wheels : vector<br>- hasABS : bool<br>+ hasGPS : bool"]
+subgraph man_det [ ]
+direction LR
+Seat2["<b>Seat</b>"]
+Engine2["<b>Engine</b>"]
+Wheel2["<b>Wheel</b>"]
+ABS2["<b>ABS</b>"]
+GPS2["<b>GPS</b>"]
+end
+Manual --> Seat2 & Engine2 & Wheel2 & ABS2 & GPS2
+end
+end
 
-style Director fill:transparent,stroke:#000,color:#000,font-style:normal,font-weight:normal
+Director --> Builder
+CarBuilder ==>|реализует| Builder
+ManualBuilder ==>|реализует| Builder
+CarBuilder -.->|создает| Car
+ManualBuilder -.->|создает| Manual
+
+%% Скрытие рамок групп
+style top fill:transparent,stroke:transparent
+style middle fill:transparent,stroke:transparent
+style bottom fill:transparent,stroke:transparent
+style left_side fill:transparent,stroke:transparent
+style right_side fill:transparent,stroke:transparent
+style car_det fill:transparent,stroke:transparent
+style man_det fill:transparent,stroke:transparent
+
+%% Черный стиль без заливок и курсива
 style Builder fill:transparent,stroke:#000,color:#000,font-style:normal,font-weight:normal
+style Director fill:transparent,stroke:#000,color:#000,font-style:normal,font-weight:normal
 style CarBuilder fill:transparent,stroke:#000,color:#000,font-style:normal,font-weight:normal
 style ManualBuilder fill:transparent,stroke:#000,color:#000,font-style:normal,font-weight:normal
 style Car fill:transparent,stroke:#000,color:#000,font-style:normal,font-weight:normal
 style Manual fill:transparent,stroke:#000,color:#000,font-style:normal,font-weight:normal
-style Seat fill:transparent,stroke:#000,color:#000,font-style:normal,font-weight:normal
-style Engine fill:transparent,stroke:#000,color:#000,font-style:normal,font-weight:normal
-style Wheel fill:transparent,stroke:#000,color:#000,font-style:normal,font-weight:normal
-style ABS fill:transparent,stroke:#000,color:#000,font-style:normal,font-weight:normal
-style GPS fill:transparent,stroke:#000,color:#000,font-style:normal,font-weight:normal
+style Seat1 fill:transparent,stroke:#000,color:#000,font-style:normal,font-weight:normal
+style Engine1 fill:transparent,stroke:#000,color:#000,font-style:normal,font-weight:normal
+style Wheel1 fill:transparent,stroke:#000,color:#000,font-style:normal,font-weight:normal
+style ABS1 fill:transparent,stroke:#000,color:#000,font-style:normal,font-weight:normal
+style GPS1 fill:transparent,stroke:#000,color:#000,font-style:normal,font-weight:normal
+style Seat2 fill:transparent,stroke:#000,color:#000,font-style:normal,font-weight:normal
+style Engine2 fill:transparent,stroke:#000,color:#000,font-style:normal,font-weight:normal
+style Wheel2 fill:transparent,stroke:#000,color:#000,font-style:normal,font-weight:normal
+style ABS2 fill:transparent,stroke:#000,color:#000,font-style:normal,font-weight:normal
+style GPS2 fill:transparent,stroke:#000,color:#000,font-style:normal,font-weight:normal
 ```
 
 ## Особенности реализации на C++
