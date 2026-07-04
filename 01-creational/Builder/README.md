@@ -8,8 +8,7 @@
 разделить алгоритм создания сложного объекта от его представления. Выделить класс Director, который будет задавать порядок шагов сборки, и абстрактный класс Builder, который определяет эти шаги. Конкретные строители (CarBuilder, ManualBuilder) реализуют шаги по-своему и возвращают разные конечные продукты.
 
 ## UML Схема класса
-```
-mermaid
+``` mermaid
 classDiagram
 class Director {
 +makeSportCar(Builder) void
@@ -74,7 +73,7 @@ style CarBuilder fill:transparent,stroke:#000,color:#000,font-style:normal,font-
 style ManualBuilder fill:transparent,stroke:#000,color:#000,font-style:normal,font-weight:normal
 style Car fill:transparent,stroke:#000,color:#000,font-style:normal,font-weight:normal
 style Manual fill:transparent,stroke:#000,color:#000,font-style:normal,font-weight:normal
-``
+```
 
 ## Особенности реализации на C++
 ### Абстрактный класс:
