@@ -74,7 +74,7 @@ style CarBuilder fill:transparent,stroke:#000,color:#000,font-style:normal,font-
 style ManualBuilder fill:transparent,stroke:#000,color:#000,font-style:normal,font-weight:normal
 style Car fill:transparent,stroke:#000,color:#000,font-style:normal,font-weight:normal
 style Manual fill:transparent,stroke:#000,color:#000,font-style:normal,font-weight:normal
-```
+``
 
 ## Особенности реализации на C++
 ### Абстрактный класс:
