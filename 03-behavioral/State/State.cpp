@@ -1,262 +1,208 @@
 #include <iostream>
+#include <memory>
 #include <string>
-#include <locale>
 
 using namespace std;
 
 class CoffeeMachine;
 
-class IState {
+class State
+{
 public:
-    virtual ~IState() {}
-    virtual void insertCoin(CoffeeMachine* machine) = 0;
-    virtual void selectDrink(CoffeeMachine* machine) = 0;
-    virtual void dispense(CoffeeMachine* machine) = 0;
-    virtual string getStateName() const = 0;
+    virtual ~State() = default;
+    virtual void InsertCoin() = 0;
+    virtual void SelectDrink() = 0;
+    virtual void Dispense() = 0;
 };
 
-class IdleState : public IState {
-public:
-    void insertCoin(CoffeeMachine* machine) override;
-    void selectDrink(CoffeeMachine* machine) override;
-    void dispense(CoffeeMachine* machine) override;
-    string getStateName() const override;
-};
-
-class SelectionState : public IState {
-public:
-    void insertCoin(CoffeeMachine* machine) override;
-    void selectDrink(CoffeeMachine* machine) override;
-    void dispense(CoffeeMachine* machine) override;
-    string getStateName() const override;
-};
-
-class InsufficientFundsState : public IState {
-public:
-    void insertCoin(CoffeeMachine* machine) override;
-    void selectDrink(CoffeeMachine* machine) override;
-    void dispense(CoffeeMachine* machine) override;
-    string getStateName() const override;
-};
-
-class PreparationState : public IState {
-public:
-    void insertCoin(CoffeeMachine* machine) override;
-    void selectDrink(CoffeeMachine* machine) override;
-    void dispense(CoffeeMachine* machine) override;
-    string getStateName() const override;
-};
-
-class CoffeeMachine {
+class NoCoinState : public State
+{
 private:
-    IState* state;
-    int coins;
+    CoffeeMachine* machine;
+public:
+    NoCoinState(CoffeeMachine* _machine) : machine(_machine) {}
+
+    void InsertCoin() override;
+    void SelectDrink() override;
+    void Dispense() override;
+};
+
+class HasCoinState : public State
+{
+private:
+    CoffeeMachine* machine;
+public:
+    HasCoinState(CoffeeMachine* _machine) : machine(_machine) {}
+
+    void InsertCoin() override;
+    void SelectDrink() override;
+    void Dispense() override;
+};
+
+class DispensingState : public State
+{
+private:
+    CoffeeMachine* machine;
+public:
+    DispensingState(CoffeeMachine* _machine) : machine(_machine) {}
+
+    void InsertCoin() override;
+    void SelectDrink() override;
+    void Dispense() override;
+};
+
+class CoffeeMachine
+{
+private:
+    shared_ptr<State> noCoinState;
+    shared_ptr<State> hasCoinState;
+    shared_ptr<State> dispensingState;
+    shared_ptr<State> currentState;
+
+    int drinkCount;
     string selectedDrink;
 
 public:
-    CoffeeMachine() : state(nullptr), coins(0), selectedDrink("") {
-        state = new IdleState();
+    CoffeeMachine(int initialDrink = 5) : drinkCount(initialDrink)
+    {
+        noCoinState = make_shared<NoCoinState>(this);
+        hasCoinState = make_shared<HasCoinState>(this);
+        dispensingState = make_shared<DispensingState>(this);
+        currentState = noCoinState;
     }
 
-    ~CoffeeMachine() {
-        if (state != nullptr) {
-            delete state;
-            state = nullptr;
-        }
+    void SetState(shared_ptr<State> state)
+    {
+        currentState = state;
     }
 
-    void setState(IState* newState) {
-        if (state != nullptr) {
-            delete state;
-        }
-        state = newState;
+    void InsertCoin()
+    {
+        currentState->InsertCoin();
     }
 
-    void addCoin(int amount) {
-        coins += amount;
-        cout << "(Машина): Внесено " << amount << " руб. Всего: " << coins << " руб." << endl;
+    void SelectDrink()
+    {
+        currentState->SelectDrink();
     }
 
-    int getCoins() const {
-        return coins;
+    void Dispense()
+    {
+        currentState->Dispense();
+    }
+    void Refill(int amount)
+    {
+        drinkCount += amount;
+        cout << "Кофемашина щаправлена. Текущее количество напитков: " << drinkCount << endl;
     }
 
-    void resetCoins() {
-        coins = 0;
-    }
+    shared_ptr<State> GetNoCoinState() { return noCoinState; }
+    shared_ptr<State> GetHasCoinState() { return hasCoinState; }
+    shared_ptr<State> GetDispensingState() { return dispensingState; }
 
-    void setSelectedDrink(const string& drink) {
-        selectedDrink = drink;
-    }
+    int GetDrinkCount() { return drinkCount; }
+    void SetDrinkCount(int count) { drinkCount = count; }
 
-    string getSelectedDrink() const {
-        return selectedDrink;
-    }
-
-    void insertCoin() {
-        state->insertCoin(this);
-    }
-
-    void selectDrink() {
-        state->selectDrink(this);
-    }
-
-    void dispense() {
-        state->dispense(this);
-    }
-
-    string getStateName() const {
-        return state->getStateName();
-    }
+    void SetSelectedDrink(string drink) { selectedDrink = drink; }
+    string GetSelectedDrink() { return selectedDrink; }
 };
 
-
-void IdleState::insertCoin(CoffeeMachine* machine) {
-    cout << "(Ожидание): Монета принята." << endl;
-    machine->addCoin(50);
-    machine->setState(new SelectionState());
+void NoCoinState::InsertCoin()
+{
+    cout << "Монета принята. Выберите напиток.\n";
+    machine->SetState(machine->GetHasCoinState());
 }
 
-void IdleState::selectDrink(CoffeeMachine* machine) {
-    cout << "(Ошибка): Сначала внесите монету!" << endl;
+void NoCoinState::SelectDrink()
+{
+    cout << "Сначала бросьте монету\n";
 }
 
-void IdleState::dispense(CoffeeMachine* machine) {
-    cout << "(Ошибка): Сначала внесите монету и выберите напиток!" << endl;
+void NoCoinState::Dispense()
+{
+    cout << "Нечего выдавать. Добавьте монету и выберите напиток\n";
 }
 
-string IdleState::getStateName() const {
-    return "Ожидание монеты";
+void HasCoinState::InsertCoin()
+{
+    cout << "Монета уже вставлена.\n";
 }
 
-void SelectionState::insertCoin(CoffeeMachine* machine) {
-    cout << "(Выбор): Монета принята." << endl;
-    machine->addCoin(50);
-}
-
-void SelectionState::selectDrink(CoffeeMachine* machine) {
-    cout << "(Выбор): Доступные напитки:" << endl;
-    cout << "1. Эспрессо" << endl;
-    cout << "2. Капучино" << endl;
-    cout << "3. Латте" << endl;
-    cout << "Выберите напиток (введите номер): ";
-
+void HasCoinState::SelectDrink()
+{
     int choice;
+    cout << "Выберите напиток:\n1 - Эспрессо\n2 - Капучино\n3 - Латте\n";
     cin >> choice;
 
-    string drink;
-    switch (choice) {
-    case 1:
-        drink = "Эспрессо";
-        break;
-    case 2:
-        drink = "Капучино";
-        break;
-    case 3:
-        drink = "Латте";
-        break;
+    switch (choice)
+    {
+    case 1: machine->SetSelectedDrink("Эспрессо"); break;
+    case 2: machine->SetSelectedDrink("Капучино"); break;
+    case 3: machine->SetSelectedDrink("Латте"); break;
     default:
-        cout << "(Ошибка): Неверный номер! Попробуйте снова." << endl;
+        cout << "Неверный выбор\n";
         return;
     }
 
-    machine->setSelectedDrink(drink);
-    cout << "(Выбор): Выбран напиток '" << drink << "'." << endl;
+    cout << "Вы выбрали: " << machine->GetSelectedDrink() << endl;
+    machine->SetState(machine->GetDispensingState());
+}
 
-    if (machine->getCoins() >= 100) {
-        cout << "(Выбор): Достаточно средств. Начинаю приготовление." << endl;
-        machine->setState(new PreparationState());
+void HasCoinState::Dispense()
+{
+    cout << "Сначала выберите напиток.\n";
+}
+
+void DispensingState::InsertCoin()
+{
+    cout << "Подождите, идет приготовление напитка.\n";
+}
+
+void DispensingState::SelectDrink()
+{
+    cout << "Напиток уже готовится.\n";
+}
+
+void DispensingState::Dispense()
+{
+    if (machine->GetDrinkCount() > 0)
+    {
+        cout << "Готовим " << machine->GetSelectedDrink() << "...\n";
+        machine->SetDrinkCount(machine->GetDrinkCount() - 1);
+        cout << "Ваш " << machine->GetSelectedDrink() << " готов!\n";
     }
-    else {
-        cout << "(Выбор): Недостаточно средств! Внесите ещё монет." << endl;
-        cout << "Нужно: 100 руб. Внесено: " << machine->getCoins() << " руб." << endl;
-        machine->setState(new InsufficientFundsState());
+    else
+    {
+        cout << "Напитки закончились\n";
     }
+    machine->SetState(machine->GetNoCoinState());
 }
 
-void SelectionState::dispense(CoffeeMachine* machine) {
-    cout << "(Ошибка): Сначала выберите напиток!" << endl;
-}
+int main()
+{
+    setlocale(LC_ALL, "Rus");
 
-string SelectionState::getStateName() const {
-    return "Выбор напитка";
-}
+    CoffeeMachine machine(3);
 
-void InsufficientFundsState::insertCoin(CoffeeMachine* machine) {
-    cout << "(Недостаточно средств): Монета принята." << endl;
-    machine->addCoin(50);
+    while (true)
+    {
+        cout << "\n1 - Вставить монету\n2 - Выбрать напиток\n3 - Получить напиток\n4 - Заправить кофемашину\n0 - Выход\n";
+        int cmd;
+        cin >> cmd;
 
-    if (machine->getCoins() >= 100) {
-        cout << "(Недостаточно средств): Теперь достаточно средств." << endl;
-        machine->setState(new PreparationState());
+        switch (cmd)
+        {
+        case 1: machine.InsertCoin(); break;
+        case 2: machine.SelectDrink(); break;
+        case 3: machine.Dispense(); break;
+        case 4: int amount;
+            cout << "Введите количество добавляемых напитков: ";
+            cin >> amount;
+            machine.Refill(amount); break;
+        case 0: (cmd == 0); break;
+        default: cout << "Ошибка ввода\n";
+        }
     }
-    else {
-        cout << "(Недостаточно средств): Всё ещё недостаточно. Нужно 100 руб." << endl;
-    }
-}
-
-void InsufficientFundsState::selectDrink(CoffeeMachine* machine) {
-    cout << "(Ошибка): Дождитесь внесения полной суммы!" << endl;
-}
-
-void InsufficientFundsState::dispense(CoffeeMachine* machine) {
-    cout << "(Ошибка): Недостаточно средств для приготовления!" << endl;
-}
-
-string InsufficientFundsState::getStateName() const {
-    return "Недостаточно средств";
-}
-
-void PreparationState::insertCoin(CoffeeMachine* machine) {
-    cout << "(Ошибка): Идёт приготовление. Подождите!" << endl;
-}
-
-void PreparationState::selectDrink(CoffeeMachine* machine) {
-    cout << "(Ошибка): Идёт приготовление. Подождите!" << endl;
-}
-
-void PreparationState::dispense(CoffeeMachine* machine) {
-    cout << "(Приготовление): Начинаю приготовление " << machine->getSelectedDrink() << "..." << endl;
-    cout << "  - Нагрев воды..." << endl;
-    cout << "  - Заваривание кофе..." << endl;
-    cout << "  - Наливание в чашку..." << endl;
-    cout << "(Приготовление): " << machine->getSelectedDrink() << " готов! Приятного аппетита!" << endl;
-
-    machine->resetCoins();
-    machine->setSelectedDrink("");
-    machine->setState(new IdleState());
-}
-
-string PreparationState::getStateName() const {
-    return "Приготовление";
-}
-
-int main() {
-    setlocale(LC_ALL, "Russian");
-
-    CoffeeMachine machine;
-
-    cout << "Кофемашина" << endl;
-    cout << "Цена напитка: 100 руб." << endl;
-    cout << "Монета: 50 руб." << endl;
-
-    cout << "Попытка выбрать напиток без монеты" << endl;
-    machine.selectDrink();
-
-    cout << "\nВнесение монеты" << endl;
-    machine.insertCoin();
-
-    cout << "\nВыбор напитка" << endl;
-    machine.selectDrink();
-
-    cout << "\nВнесение ещё одной монеты (если нужно)" << endl;
-    machine.insertCoin();
-
-    cout << "\nПолучение напитка" << endl;
-    machine.dispense();
-
-    cout << "\nСостояноие кофемашины" << endl;
-    cout << "Текущее состояние: " << machine.getStateName() << endl;
 
     return 0;
 }
